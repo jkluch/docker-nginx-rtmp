@@ -38,7 +38,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value={{branch}}
-            type=raw,value=latest,suffix=-cuda
+            type=raw,value=latest,suffix=
 
       - name: Build and push base Docker image
         uses: docker/build-push-action@v2.7.0
