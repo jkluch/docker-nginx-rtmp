@@ -10,6 +10,12 @@ on:
   release:
     types: [published]
 
+env:
+  # Use docker.io for Docker Hub if empty
+  # REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: kluch/nginx-rtmp
+
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
