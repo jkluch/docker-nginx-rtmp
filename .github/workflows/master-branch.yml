@@ -1,0 +1,76 @@
+name: Publish Docker image
+
+on:
+  schedule:
+    - cron: '31 17 5 * *'
+  push:
+    branches: [ master ]
+    # Publish semver tags as releases.
+    tags: [ 'v*.*.*' ]
+  release:
+    types: [published]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  # REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: kluch/nginx-rtmp
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      
+      - name: Docker Login
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      
+      - name: Docker Metadata action
+        uses: docker/metadata-action@v3.6.0
+        id: meta
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=auto
+            prefix=
+            suffix=
+          tags: |
+            # branch event
+            type=raw,value={{branch}}
+        
+      - name: Docker Metadata cuda action
+        uses: docker/metadata-action@v3.6.0
+        id: meta-cuda
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=auto
+            prefix=
+            suffix=-cuda
+          tags: |
+            # branch event
+            type=raw,value={{branch}},suffix=-cuda
+
+      - name: Build and push base Docker image
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: .
+          file: {context}/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push cuda Docker image
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: .
+          file: {context}/Dockerfile.cuda
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-cuda.outputs.tags }}
+          labels: ${{ steps.meta-cuda.outputs.labels }}
