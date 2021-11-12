@@ -1,4 +1,4 @@
-name: Manual Docker build
+name: Manual build
 
 on: workflow_dispatch
 
@@ -30,14 +30,6 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value={{branch}}
-        
-      - name: Docker Metadata cuda action
-        uses: docker/metadata-action@v3.6.0
-        id: meta-cuda
-        with:
-          images: ${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value={{branch}},suffix=-cuda
 
       - name: Build and push base Docker image
         uses: docker/build-push-action@v2.7.0
@@ -47,12 +39,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Build and push cuda Docker image
-        uses: docker/build-push-action@v2.7.0
-        with:
-          context: .
-          file: Dockerfile.cuda
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-cuda.outputs.tags }}
-          labels: ${{ steps.meta-cuda.outputs.labels }}

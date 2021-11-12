@@ -1,14 +1,6 @@
-name: Master build
+name: Manual build cuda
 
-on:
-  schedule:
-    - cron: '31 17 5 * *'
-  push:
-    branches: [ master ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
-  release:
-    types: [published]
+on: workflow_dispatch
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -30,24 +22,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      
+
       - name: Docker Metadata action
         uses: docker/metadata-action@v3.6.0
         id: meta
         with:
           images: ${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=auto
-            prefix=
-            suffix=
           tags: |
-            type=raw,value={{branch}}
+            type=raw,value={{branch}},suffix=-cuda
 
       - name: Build and push base Docker image
         uses: docker/build-push-action@v2.7.0
         with:
           context: .
-          file: Dockerfile
+          file: Dockerfile.cuda
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
