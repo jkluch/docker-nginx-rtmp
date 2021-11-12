@@ -29,7 +29,6 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            # branch event
             type=raw,value={{branch}}
         
       - name: Docker Metadata cuda action
@@ -38,7 +37,6 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            # branch event
             type=raw,value={{branch}},suffix=-cuda
 
       - name: Build and push base Docker image
