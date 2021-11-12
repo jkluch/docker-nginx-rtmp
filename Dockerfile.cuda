@@ -112,11 +112,10 @@ RUN cd /tmp/ffmpeg-${FFMPEG_VERSION} && \
   --enable-small \
   --enable-libfdk-aac \
   --enable-openssl \
-  --enable-libnpp \
+  # --enable-libnpp \
   --enable-cuda \
   --enable-cuvid \
   --enable-nvenc \
-  --enable-libnpp \
   --disable-debug \
   --disable-doc \
   --disable-ffplay \
@@ -153,8 +152,9 @@ RUN apt update && apt install -y --no-install-recommends \
   curl \
   gettext \
 #   libpcre3-dev \
-#   libnvidia-decode-${NVIDIA_DRIVER_VERSION} \
-#   libnvidia-encode-${NVIDIA_DRIVER_VERSION} \
+  libnpp-11-4 \
+  # libnvidia-decode-${NVIDIA_DRIVER_VERSION} \
+  # libnvidia-encode-${NVIDIA_DRIVER_VERSION} \
   libtheora0 \
   openssl \
   rtmpdump
